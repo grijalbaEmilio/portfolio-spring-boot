@@ -50,8 +50,12 @@ public class ProjectService {
         return findOptional.get();
     }
 
-    public void deleteById(Long id) throws NotFoundResource {
-        findById(id);
+    public void deleteById(Long id) throws IOException {
+        Project project = findById(id);
+        String imageName = Arrays
+                .stream(project.getImgUrl().split("/"))
+                .reduce("", (x, y)->y);
+        imageStorage.deleteImg(imageName);
         repository.deleteById(id);
     }
 

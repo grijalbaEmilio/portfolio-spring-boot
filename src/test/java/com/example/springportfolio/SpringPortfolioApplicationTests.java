@@ -15,4 +15,15 @@ class SpringPortfolioApplicationTests {
 		System.out.println(Arrays.stream(tecnologies.split(" ")).filter(x -> x.length() > 0).toList());
 	}
 
+	@Test
+	void descomponeNameImage(){
+
+		String imageUrl = "localhost:5000/gitflow-workflow.jp";
+		String imageName = Arrays
+				.stream(imageUrl.split("/"))
+				.reduce("", (x, y)->y);
+
+		System.out.println(imageName);
+	}
+
 }

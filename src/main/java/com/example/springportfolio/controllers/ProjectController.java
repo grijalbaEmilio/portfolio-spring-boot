@@ -49,7 +49,7 @@ public class ProjectController {
 
     // TODO: need delete img from server
     @DeleteMapping("/api/v1/projects/{id}")
-    public ResponseEntity<Project> deleteById(@PathVariable Long id){
+    public ResponseEntity<Project> deleteById(@PathVariable Long id) throws IOException {
         try {
             service.deleteById(id);
             return ResponseEntity.ok().build();

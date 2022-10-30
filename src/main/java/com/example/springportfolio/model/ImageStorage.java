@@ -33,8 +33,23 @@ public class ImageStorage {
     }
 
     public String generateImgPath(MultipartFile image){
-        String finalImgpath = basePath+image.getOriginalFilename();
-        return finalImgpath;
+        return basePath+image.getOriginalFilename();
+    }
+
+    public void deleteImg(MultipartFile image) throws IOException {
+        Path directoryImages = Paths.get("src/main/resources/static");
+        String absolutePath = directoryImages.toFile().getAbsolutePath();
+        Path fullPath = Paths.get(absolutePath+"/"+image.getOriginalFilename());
+
+        Files.deleteIfExists(fullPath);
+    }
+
+    public void deleteImg(String imageName) throws IOException {
+        Path directoryImages = Paths.get("src/main/resources/static");
+        String absolutePath = directoryImages.toFile().getAbsolutePath();
+        Path fullPath = Paths.get(absolutePath+"/"+imageName);
+
+        Files.delete(fullPath);
     }
 
 }
