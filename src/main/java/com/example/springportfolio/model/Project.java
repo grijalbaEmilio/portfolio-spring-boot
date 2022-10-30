@@ -63,7 +63,7 @@ public class Project {
     public void setTechnologies(List<String> technologies) {
         this.technologies = technologies
                 .stream()
-                .reduce("", (x, y) -> y+" "+x);
+                .reduce("", (x, y) -> x+","+y);
     }
 
     public String getImgUrl() {
