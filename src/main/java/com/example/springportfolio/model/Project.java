@@ -90,6 +90,12 @@ public class Project {
         this.demoUrl = demoUrl;
     }
 
+    public String getImageName(){
+        return Arrays
+                .stream(imgUrl.split("/"))
+                .reduce("", (x, y)->y);
+    }
+
     @Override
     public String toString() {
         return "Project{" +

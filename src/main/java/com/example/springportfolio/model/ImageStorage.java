@@ -15,6 +15,13 @@ public class ImageStorage {
     @Value("${app.base.path}")
     String basePath;
 
+    /**
+     * if exists image continue
+     * @param image
+     * @return
+     * @throws NullPointerException
+     * @throws IOException
+     */
     public String saveAndReturnUrl(MultipartFile image) throws NullPointerException, IOException{
         if(!image.getContentType().contains("image")) throw new InvalidFileTypeException("file must be image type");
 

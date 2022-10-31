@@ -32,8 +32,9 @@ public class ProjectService {
 
         Project project = new Project(null, title,description, null, null, codeUrl, demoUrl);
 
-        String url = imageStorage.saveAndReturnUrl(image);
+        String url = imageStorage.generateImgPath(image);
         if(repository.findByImgUrl(url) != null) throw new NoDuplicateException("already exists the img resource");
+        imageStorage.saveImg(image);
         project.setImgUrl(url);
         project.setTechnologies(Arrays.stream(technologies).toList());
 
@@ -52,11 +53,32 @@ public class ProjectService {
 
     public void deleteById(Long id) throws IOException {
         Project project = findById(id);
-        String imageName = Arrays
-                .stream(project.getImgUrl().split("/"))
-                .reduce("", (x, y)->y);
-        imageStorage.deleteImg(imageName);
+        String imageNameProjectFind = project.getImageName();
+        imageStorage.deleteImg(imageNameProjectFind);
         repository.deleteById(id);
     }
+
+    public Project
+    update(Long id, String title, String description, String codeUrl, String demoUrl, String[] technologies, MultipartFile image) throws IOException {
+        if(id == null) throw new NullPointerException("put request must be id attribute");
+        Project projectFind = findById(id);
+
+        if(title != null) projectFind.setTitle(title);
+        if(description != null) projectFind.setDescription(description);
+        if(codeUrl != null) projectFind.setCodeUrl(codeUrl);
+        if(demoUrl != null) projectFind.setDemoUrl(demoUrl);
+        if(technologies != null) projectFind.setTechnologies(Arrays.stream(technologies).toList());
+        if(image != null){
+
+            String imageNameProjectFind = projectFind.getImageName();
+            projectFind.setImgUrl(imageStorage.saveAndReturnUrl(image));
+
+            String newImageNameProjectFind = projectFind.getImageName();
+            if(!imageNameProjectFind.equals(newImageNameProjectFind)) imageStorage.deleteImg(imageNameProjectFind);
+        }
+
+        return repository.save(projectFind);
+    }
+
 
 }

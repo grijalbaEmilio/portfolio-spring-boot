@@ -47,7 +47,6 @@ public class ProjectController {
         }
     }
 
-    // TODO: need delete img from server
     @DeleteMapping("/api/v1/projects/{id}")
     public ResponseEntity<Project> deleteById(@PathVariable Long id) throws IOException {
         try {
@@ -56,5 +55,20 @@ public class ProjectController {
         } catch (NotFoundResource e) {
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
         }
+    }
+
+    @PutMapping("/api/v1/projects")
+    public ResponseEntity<Project>
+    update(Long id, String title, String description, String codeUrl, String demoUrl, String[] technologies, MultipartFile image) throws IOException {
+        try{
+            Project projectUpdate = service.update(id, title, description, codeUrl, demoUrl, technologies, image);
+            return ResponseEntity.ok(projectUpdate);
+        }catch (NotFoundResource e){
+            return ResponseEntity.notFound().eTag(e.getMessage()).build();
+        }catch(InvalidFileTypeException | NullPointerException | NoDuplicateException e){
+            return ResponseEntity.badRequest().eTag(e.getMessage()).build();
+        }
+
+
     }
 }
