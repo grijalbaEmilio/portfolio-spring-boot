@@ -10,6 +10,10 @@ import java.util.Arrays;
 class SpringPortfolioApplicationTests {
 
 	@Test
+	void sum(){
+		System.out.println(0.1+0.2);
+	}
+	@Test
 	void contextLoads() {
 		String tecnologies = "   node vue jwt ";
 		System.out.println(Arrays.stream(tecnologies.split(" ")).filter(x -> x.length() > 0).toList());

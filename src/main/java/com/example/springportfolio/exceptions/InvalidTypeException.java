@@ -2,9 +2,9 @@ package com.example.springportfolio.exceptions;
 
 import java.io.IOException;
 
-public class InvalidFileTypeException extends IOException {
+public class InvalidTypeException extends IOException {
 
-    public InvalidFileTypeException(String message){
+    public InvalidTypeException(String message){
         super("invalid file type: "+message);
     }
 }

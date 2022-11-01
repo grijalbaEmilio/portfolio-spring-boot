@@ -1,8 +1,8 @@
 package com.example.springportfolio.controllers;
 
-import com.example.springportfolio.exceptions.InvalidFileTypeException;
-import com.example.springportfolio.exceptions.NoDuplicateException;
-import com.example.springportfolio.exceptions.NotFoundResource;
+import com.example.springportfolio.exceptions.InvalidTypeException;
+import com.example.springportfolio.exceptions.DuplicateException;
+import com.example.springportfolio.exceptions.NotFoundResourceException;
 import com.example.springportfolio.model.Project;
 import com.example.springportfolio.services.ProjectService;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -33,7 +32,7 @@ public class ProjectController {
         try {
             Project projectSaved = service.save(title, description, codeUrl, demoUrl, technologies, image);
             return ResponseEntity.ok(projectSaved);
-        } catch (InvalidFileTypeException | NullPointerException | NoDuplicateException e) {
+        } catch (InvalidTypeException | NullPointerException | DuplicateException e) {
             return ResponseEntity.badRequest().eTag(e.getMessage()).build();
         }
     }
@@ -42,7 +41,7 @@ public class ProjectController {
     public ResponseEntity<Project> findById(@PathVariable Long id){
         try {
             return ResponseEntity.ok(service.findById(id));
-        } catch (NotFoundResource e) {
+        } catch (NotFoundResourceException e) {
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
         }
     }
@@ -52,7 +51,7 @@ public class ProjectController {
         try {
             service.deleteById(id);
             return ResponseEntity.ok().build();
-        } catch (NotFoundResource e) {
+        } catch (NotFoundResourceException e) {
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
         }
     }
@@ -63,9 +62,9 @@ public class ProjectController {
         try{
             Project projectUpdate = service.update(id, title, description, codeUrl, demoUrl, technologies, image);
             return ResponseEntity.ok(projectUpdate);
-        }catch (NotFoundResource e){
+        }catch (NotFoundResourceException e){
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
-        }catch(InvalidFileTypeException | NullPointerException | NoDuplicateException e){
+        }catch(InvalidTypeException | NullPointerException | DuplicateException e){
             return ResponseEntity.badRequest().eTag(e.getMessage()).build();
         }
 

@@ -1,6 +1,6 @@
 package com.example.springportfolio.model;
 
-import com.example.springportfolio.exceptions.InvalidFileTypeException;
+import com.example.springportfolio.exceptions.InvalidTypeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,14 +23,14 @@ public class ImageStorage {
      * @throws IOException
      */
     public String saveAndReturnUrl(MultipartFile image) throws NullPointerException, IOException{
-        if(!image.getContentType().contains("image")) throw new InvalidFileTypeException("file must be image type");
-
         saveImg(image);
 
         return generateImgPath(image);
     }
 
     public void saveImg(MultipartFile image)throws IOException{
+        if(!image.getContentType().contains("image")) throw new InvalidTypeException("file must be image type");
+
         Path directoryImages = Paths.get("src/main/resources/static");
         String absolutePath = directoryImages.toFile().getAbsolutePath();
 

@@ -1,11 +1,10 @@
 package com.example.springportfolio.services;
 
-import com.example.springportfolio.exceptions.NoDuplicateException;
-import com.example.springportfolio.exceptions.NotFoundResource;
+import com.example.springportfolio.exceptions.DuplicateException;
+import com.example.springportfolio.exceptions.NotFoundResourceException;
 import com.example.springportfolio.model.ImageStorage;
 import com.example.springportfolio.model.Project;
 import com.example.springportfolio.reposiroties.ProjectRepository;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,7 +32,7 @@ public class ProjectService {
         Project project = new Project(null, title,description, null, null, codeUrl, demoUrl);
 
         String url = imageStorage.generateImgPath(image);
-        if(repository.findByImgUrl(url) != null) throw new NoDuplicateException("already exists the img resource");
+        if(repository.findByImgUrl(url) != null) throw new DuplicateException("already exists the img resource");
         imageStorage.saveImg(image);
         project.setImgUrl(url);
         project.setTechnologies(Arrays.stream(technologies).toList());
@@ -45,9 +44,9 @@ public class ProjectService {
         return  repository.findAll();
     }
 
-    public Project findById(Long id)throws NotFoundResource{
+    public Project findById(Long id)throws NotFoundResourceException {
         var findOptional = repository.findById(id);
-        if(findOptional.isEmpty()) throw new NotFoundResource("project not found");
+        if(findOptional.isEmpty()) throw new NotFoundResourceException("project not found");
         return findOptional.get();
     }
 
@@ -69,7 +68,6 @@ public class ProjectService {
         if(demoUrl != null) projectFind.setDemoUrl(demoUrl);
         if(technologies != null) projectFind.setTechnologies(Arrays.stream(technologies).toList());
         if(image != null){
-
             String imageNameProjectFind = projectFind.getImageName();
             projectFind.setImgUrl(imageStorage.saveAndReturnUrl(image));
 
