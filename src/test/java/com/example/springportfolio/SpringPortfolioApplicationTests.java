@@ -11,7 +11,8 @@ class SpringPortfolioApplicationTests {
 
 	@Test
 	void sum(){
-		System.out.println(0.1+0.2);
+		Long num = 5L;
+		System.out.println(num == 5);
 	}
 	@Test
 	void contextLoads() {
