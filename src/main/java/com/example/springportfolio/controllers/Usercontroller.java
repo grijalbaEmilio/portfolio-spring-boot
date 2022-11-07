@@ -1,9 +1,7 @@
 package com.example.springportfolio.controllers;
 
-import com.example.springportfolio.exceptions.DuplicateException;
-import com.example.springportfolio.exceptions.InvalidModifyData;
-import com.example.springportfolio.exceptions.LengthException;
-import com.example.springportfolio.exceptions.NotFoundResourceException;
+import com.example.springportfolio.dto.ResponseLogin;
+import com.example.springportfolio.exceptions.*;
 import com.example.springportfolio.model.User;
 import com.example.springportfolio.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +12,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/v1/users")
 public class Usercontroller {
 
     UserService service;
@@ -23,10 +22,10 @@ public class Usercontroller {
     }
 
 
-    @PostMapping("/api/v1/users")
+    @PostMapping("/register")
     public ResponseEntity<User> save(@RequestBody User user){
         try{
-            User userSave = service.save(user);
+            User userSave = service.register(user);
             return ResponseEntity.ok(userSave);
         }
         catch (DuplicateException | LengthException e){
@@ -36,7 +35,18 @@ public class Usercontroller {
         }
     }
 
-    @GetMapping("/api/v1/users/{id}")
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(String email, String password){
+        try {
+            ResponseLogin response = service.login(email, password);
+            return ResponseEntity.ok(response);
+        } catch (NotFoundResourceException | InvalidPasswordException e) {
+            return ResponseEntity.badRequest().eTag(e.getMessage()).build();
+        }
+
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<User> findById(@PathVariable Long id){
         try {
             User userFind = service.findById(id);
@@ -46,12 +56,12 @@ public class Usercontroller {
         }
     }
 
-    @GetMapping("/api/v1/users")
+    @GetMapping("")
     public List<User> findAll(){
         return service.findAll();
     }
 
-    @DeleteMapping("/api/v1/users/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<User> deleteById(@PathVariable Long id){
         try {
             User userDelete = service.deleteById(id);
@@ -61,7 +71,7 @@ public class Usercontroller {
         }
     }
 
-    @PutMapping("/api/v1/users")
+    @PutMapping("")
     public ResponseEntity<User> update(@RequestBody User user){
         try {
             User userUpdate = service.update(user);

@@ -1,10 +1,13 @@
 package com.example.springportfolio;
 
+import com.example.springportfolio.model.Role;
+import com.example.springportfolio.model.User;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 //@SpringBootTest
 class SpringPortfolioApplicationTests {
@@ -29,6 +32,37 @@ class SpringPortfolioApplicationTests {
 				.reduce("", (x, y)->y);
 
 		System.out.println(imageName);
+	}
+
+	String jwtSecret="openb";
+	int jwtExpirationMs =86400000;
+
+	enum Nn{ ADMIN, USER};
+
+	@Test
+	void generateJwtToken() {
+
+		// UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
+		User us = new User(null, "luis","grialba", "luis@gmial.com","contraseñita", Role.ADMIN);
+		Map usm = new HashMap<String, Object>();
+		usm.put("id", us.getId());
+		usm.put("name", us.getName());
+		usm.put("email", us.getEmail());
+		usm.put("password", us.getPassword());
+		//var token = Jwts.header(usm).
+		var token = Jwts.builder()
+				.setSubject(us.getName())
+				.setSubject(us.getPassword())
+				.setClaims(usm)
+				//.setPayload(us.getUsername())
+				.setIssuedAt(new Date())
+				//.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+				.signWith(SignatureAlgorithm.HS384, jwtSecret)
+				.compact();
+
+		System.out.println(token);
+		var subject = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+		System.out.println(subject);
 	}
 
 }

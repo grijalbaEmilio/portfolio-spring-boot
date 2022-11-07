@@ -1,9 +1,7 @@
 package com.example.springportfolio.services;
 
-import com.example.springportfolio.exceptions.DuplicateException;
-import com.example.springportfolio.exceptions.InvalidModifyData;
-import com.example.springportfolio.exceptions.LengthException;
-import com.example.springportfolio.exceptions.NotFoundResourceException;
+import com.example.springportfolio.dto.ResponseLogin;
+import com.example.springportfolio.exceptions.*;
 import com.example.springportfolio.model.User;
 import com.example.springportfolio.reposiroties.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,13 +16,15 @@ public class UserService {
 
     UserRepository repository;
     PasswordEncoder passwordEncoder;
+    JWTUserService jwtUserService;
 
-    public UserService(UserRepository repository){
+    public UserService(UserRepository repository, JWTUserService jwtUserService){
         this.repository = repository;
+        this.jwtUserService = jwtUserService;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
-    public User save(User  user) throws DuplicateException, LengthException {
+    public User register(User  user) throws DuplicateException, LengthException {
         User userFind = repository.findByEmail(user.getEmail());
         if(userFind != null) throw new DuplicateException("email's user exists");
         if(user.getPassword().length() < 6) throw new LengthException("password must have min 6 characters");
@@ -33,6 +33,19 @@ public class UserService {
         user.setPassword(hashPassword);
 
         return repository.save(user);
+    }
+
+    public ResponseLogin login(String email, String password) throws NotFoundResourceException, InvalidPasswordException {
+        User user = repository.findByEmail(email);
+        if(user == null) throw new NotFoundResourceException("user not found");
+
+        boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
+
+        if(!passwordMatch) throw new InvalidPasswordException("incorrect password");
+
+        String accessToken = jwtUserService.generateAccessToken(user);
+
+        return new ResponseLogin(user, accessToken);
     }
 
     public List<User> findAll(){
