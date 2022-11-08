@@ -14,17 +14,9 @@ import java.util.Date;
 @SpringBootApplication
 public class SpringPortfolioApplication {
 
+	// TODO: authentication all end points with jwt
 	public static void main(String[] args) {
-		var context = SpringApplication.run(SpringPortfolioApplication.class, args);
-		/*UserRepository userRepo = context.getBean(UserRepository.class);
-		CommentRepository commentRepo = context.getBean(CommentRepository.class);
-		User u1 = userRepo.findAll().get(0);
-		Comment parent = commentRepo.findAll().get(0);
-
-		commentRepo.save(new Comment(null, "content with parent",new Date(), parent, u1));
-		System.out.println(commentRepo.findAll());*/
-
-
+		SpringApplication.run(SpringPortfolioApplication.class, args);
 	}
 
 }

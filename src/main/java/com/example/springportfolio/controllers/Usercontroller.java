@@ -23,7 +23,7 @@ public class Usercontroller {
 
 
     @PostMapping("/register")
-    public ResponseEntity<User> save(@RequestBody User user){
+    public ResponseEntity<User> register(@RequestBody User user){
         try{
             User userSave = service.register(user);
             return ResponseEntity.ok(userSave);
@@ -43,45 +43,53 @@ public class Usercontroller {
         } catch (NotFoundResourceException | InvalidPasswordException e) {
             return ResponseEntity.badRequest().eTag(e.getMessage()).build();
         }
-
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable Long id){
+    public ResponseEntity<User> findById(@PathVariable Long id, @RequestHeader String token){
         try {
-            User userFind = service.findById(id);
+            User userFind = service.findById(id, token);
             return ResponseEntity.ok(userFind);
         }catch (NotFoundResourceException e){
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
+        }catch (NotAuthorizedException e) {
+            return ResponseEntity.status(401).eTag(e.getMessage()).build();
         }
     }
 
     @GetMapping("")
-    public List<User> findAll(){
-        return service.findAll();
+    public ResponseEntity<List<User>> findAll(@RequestHeader String token){
+        try {
+            List<User> users = service.findAll(token);
+            return ResponseEntity.ok(users);
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(401).eTag(e.getMessage()).build();
+        }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<User> deleteById(@PathVariable Long id){
+    public ResponseEntity<User> deleteById(@PathVariable Long id, @RequestHeader String token){
         try {
-            User userDelete = service.deleteById(id);
+            User userDelete = service.deleteById(id, token);
             return ResponseEntity.ok(userDelete);
         } catch (NotFoundResourceException e) {
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
+        } catch (NotAuthorizedException e){
+            return ResponseEntity.status(401).eTag(e.getMessage()).build();
         }
     }
 
     @PutMapping("")
-    public ResponseEntity<User> update(@RequestBody User user){
+    public ResponseEntity<User> update(@RequestBody User user, @RequestHeader String token){
         try {
-            User userUpdate = service.update(user);
+            User userUpdate = service.update(user, token);
             return ResponseEntity.ok(userUpdate);
         } catch (NotFoundResourceException e) {
             return ResponseEntity.notFound().eTag(e.getMessage()).build();
-        } catch (InvalidModifyData e) {
-            return ResponseEntity.badRequest().eTag(e.getMessage()).build();
-        }catch (ConstraintViolationException | TransactionSystemException e){
+        } catch (ConstraintViolationException | TransactionSystemException e){
             return ResponseEntity.badRequest().eTag("constraint exception").build();
+        } catch (NotAuthorizedException e ){
+            return ResponseEntity.status(401).eTag(e.getMessage()).build();
         }
     }
 }

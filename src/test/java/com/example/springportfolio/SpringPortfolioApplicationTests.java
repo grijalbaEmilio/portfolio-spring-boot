@@ -34,7 +34,7 @@ class SpringPortfolioApplicationTests {
 		System.out.println(imageName);
 	}
 
-	String jwtSecret="openb";
+	String jwtSecret="fritjlsdljf__4ritsi7788";
 	int jwtExpirationMs =86400000;
 
 	enum Nn{ ADMIN, USER};
@@ -43,25 +43,28 @@ class SpringPortfolioApplicationTests {
 	void generateJwtToken() {
 
 		// UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-		User us = new User(null, "luis","grialba", "luis@gmial.com","contraseñita", Role.ADMIN);
-		Map usm = new HashMap<String, Object>();
-		usm.put("id", us.getId());
-		usm.put("name", us.getName());
-		usm.put("email", us.getEmail());
-		usm.put("password", us.getPassword());
-		//var token = Jwts.header(usm).
+		User user = new User(null, "luis","grialba", "luis@gmial.com","contraseñita", Role.ADMIN);
+		HashMap<String, Object> payload = new HashMap<>();
+		payload.put("id", user.getId());
+		payload.put("name", user.getName());
+		payload.put("lastname", user.getLastName());
+		payload.put("email", user.getEmail());
+		payload.put("password", user.getPassword());
+		payload.put("role", user.getRole());
+
 		var token = Jwts.builder()
-				.setSubject(us.getName())
-				.setSubject(us.getPassword())
-				.setClaims(usm)
-				//.setPayload(us.getUsername())
+				.setClaims(payload)
 				.setIssuedAt(new Date())
-				//.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-				.signWith(SignatureAlgorithm.HS384, jwtSecret)
+				.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+				.signWith(SignatureAlgorithm.HS512, jwtSecret)
 				.compact();
 
 		System.out.println(token);
+		token = "eyJhbGciOiJIUzUxMiJ9.eyJwYXNzd29yZCI6IiQyYSQxMCRsTG5mQk5mSU1lRGplaU9MZXY2eVBlRklTVGRaL0hTeDhOMEtDaXhJNU12NVAuMFNheVJmLiIsInJvbGUiOiJSRVZJRVdFUiIsIm5hbWUiOiJlbCDDum5pY28gcmV2aXNvciIsImlkIjoxMSwiZXhwIjoxNjY3OTU4NTUwLCJpYXQiOjE2Njc4NzIxNTAsImVtYWlsIjoidGVzdFRva2VuQGdtYWlsLmNvbSIsImxhc3RuYW1lIjoiR3JpamFsYmEifQ.uH6qNaxul2ixevNwliv2m5oEFA0oIsCzHUFOrPS8G8rUAdWMVt-ghnryZ3z89T-IDfzDfsIHtegHKpRRHEgrjg";
 		var subject = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+		Integer id = (Integer) subject.get("id");
+		Long idL = id.longValue();
+		User users = new User(idL, "luis","grialba", "luis@gmial.com","contraseñita", Role.ADMIN);
 		System.out.println(subject);
 	}
 

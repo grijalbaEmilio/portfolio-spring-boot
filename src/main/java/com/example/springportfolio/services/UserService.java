@@ -48,26 +48,31 @@ public class UserService {
         return new ResponseLogin(user, accessToken);
     }
 
-    public List<User> findAll(){
+    public List<User> findAll(String token) throws NotAuthorizedException {
+        jwtUserService.adminValidateAccessToken(token);
         return repository.findAll();
     }
 
-    public User findById(Long id) throws NotFoundResourceException {
+    public User findById(Long id, String token) throws NotFoundResourceException, NotAuthorizedException {
+        jwtUserService.adminValidateAccessToken(token);
         Optional<User> userFind = repository.findById(id);
+
 
         if(userFind.isEmpty()) throw new NotFoundResourceException("user not found");
         return userFind.get();
     }
 
-    public User deleteById(Long id) throws NotFoundResourceException {
-        User userDelete = findById(id);
+    public User deleteById(Long id, String token) throws NotFoundResourceException, NotAuthorizedException {
+        User userDelete = findById(id, token);
+
+
         repository.deleteById(id);
         return userDelete;
     }
 
-    public  User update(User user) throws NotFoundResourceException, InvalidModifyData {
-        User userFind = findById(user.getId());
-        if(!userFind.getPassword().equals(user.getPassword())) throw new InvalidModifyData("can't be done password");
+    public  User update(User user, String token) throws NotFoundResourceException, NotAuthorizedException {
+        User userFind = findById(user.getId(), token);
+        user.setPassword(userFind.getPassword());
 
         return repository.save(user);
     }

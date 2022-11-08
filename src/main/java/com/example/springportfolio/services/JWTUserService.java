@@ -1,9 +1,8 @@
 package com.example.springportfolio.services;
 
-import com.example.springportfolio.exceptions.InvalidTokenException;
+import com.example.springportfolio.exceptions.NotAuthorizedException;
 import com.example.springportfolio.model.User;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +13,10 @@ import java.util.Map;
 @Component
 public class JWTUserService {
 
-    @Value("jwtSecret")
-    private String jwtSecret;
+    @Value("${jwtSecret}")
+    String jwtSecret;
+    @Value("${jwtExpirationMs}")
+    String jwtExpirationMs;
 
 
     public String generateAccessToken(User user){
@@ -33,16 +34,17 @@ public class JWTUserService {
         return  Jwts.builder()
                 .setClaims(payload)
                 .setIssuedAt(new Date())
-                //.setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS384, jwtSecret)
+                .setExpiration(new Date((new Date()).getTime() + Integer.parseInt(jwtExpirationMs)))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
 
-    public User validateAccessToken(String token) throws InvalidTokenException {
+    public User validateAccessToken(String token) throws NotAuthorizedException {
 
         try{
             Map<String, Object> userClaims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
-            User user = new User((Long) userClaims.get("id"), null, null, null, null, null);
+            Long id = ((Integer)userClaims.get("id")).longValue();
+            User user = new User(id, null, null, null, null, null);
             return user
                     .setPassword((String) userClaims.get("password"))
                     .setEmail((String) userClaims.get("email"))
@@ -50,9 +52,15 @@ public class JWTUserService {
                     .setRole((String) userClaims.get("role"))
                     .setLastName((String) userClaims.get("lastname"));
 
-        }catch (Exception e){
-            throw new InvalidTokenException("Json Web Token is invalid");
+        }catch (ExpiredJwtException | MalformedJwtException | SignatureException | IllegalArgumentException | UnsupportedJwtException e){
+            throw new NotAuthorizedException("Json Web Token is invalid");
         }
 
+    }
+
+    public User adminValidateAccessToken(String token) throws NotAuthorizedException {
+        User user = validateAccessToken(token);
+        if(!user.getRole().toString().equals("ADMIN")) throw new NotAuthorizedException("user is not administrator");
+        return user;
     }
 }

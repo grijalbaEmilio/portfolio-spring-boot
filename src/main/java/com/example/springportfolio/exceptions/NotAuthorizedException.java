@@ -2,9 +2,9 @@ package com.example.springportfolio.exceptions;
 
 import java.io.IOException;
 
-public class InvalidTokenException extends IOException {
+public class NotAuthorizedException extends IOException {
 
-    public InvalidTokenException(String message){
+    public NotAuthorizedException(String message){
         super("invalid token exception: "+message);
     }
 }
